@@ -8,9 +8,12 @@
     let addbutton: HTMLInputElement;
 
     const onFileSelected = (e) => {
-        let image = e.target.files[0];
+        setPreview(e.target.files[0]);
+    };
+
+    const setPreview = (imageData: Blob) => {
         let reader = new FileReader();
-        reader.readAsDataURL(image);
+        reader.readAsDataURL(imageData);
         reader.onload = (e: ProgressEvent<FileReader>) => {
             preview = e.target.result.toString();
         };
@@ -43,7 +46,8 @@
                     throw new Error("Clipboard contains non-image data.");
                 }
                 const blob = await item.getType("image/png");
-                preview = URL.createObjectURL(blob);
+                setPreview(blob);
+                //preview = URL.createObjectURL(blob);
             }
         } catch (error) {
             console.error(error.message);
