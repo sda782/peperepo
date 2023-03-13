@@ -11,11 +11,13 @@
 
 <Group spacing="xs">
     <Input
+        style="color:white"
         size="xs"
         type="email"
         placeholder="John@Doe.com"
         bind:value={email} />
     <Input
+        style="color:white"
         size="xs"
         type="password"
         placeholder="password101"
