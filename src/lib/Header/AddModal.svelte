@@ -1,11 +1,19 @@
 <script lang="ts">
-    import { Center, Modal, Image, Space, Button } from "@svelteuidev/core";
+    import {
+        Center,
+        Modal,
+        Image,
+        Space,
+        Button,
+        Text,
+    } from "@svelteuidev/core";
     import { upload } from "../firebaseStorage/firebaseStorageApi";
     import addButonImage from "../../assets/add_white.png";
 
     export let opened: boolean = false;
     let preview: string = undefined;
     let addbutton: HTMLInputElement;
+    let errorMessage: string = undefined;
 
     const onFileSelected = (e) => {
         setPreview(e.target.files[0]);
@@ -30,6 +38,14 @@
         onClose();
     };
 
+    const onFail = () => {
+        addbutton.click();
+        errorMessage = "can't paste image select file instead";
+        setTimeout(() => {
+            errorMessage = undefined;
+        }, 1000);
+    };
+
     async function pasteImage() {
         try {
             const permissionName = "clipboard-read" as PermissionName;
@@ -37,20 +53,20 @@
                 name: permissionName,
             });
             if (permission.state === "denied") {
-                throw new Error("Not allowed to read clipboard.");
+                onFail();
+                return;
             }
             const clipboardContents = await navigator.clipboard.read();
             for (const item of clipboardContents) {
                 if (!item.types.includes("image/png")) {
-                    addbutton.click();
-                    throw new Error("Clipboard contains non-image data.");
+                    onFail();
+                    return;
                 }
                 const blob = await item.getType("image/png");
                 setPreview(blob);
-                //preview = URL.createObjectURL(blob);
             }
         } catch (error) {
-            console.error(error.message);
+            onFail();
         }
     }
 </script>
@@ -75,6 +91,9 @@
         alt="image input"
         on:change={(e) => onFileSelected(e)}
         bind:this={addbutton} />
+    {#if errorMessage}
+        <Text>{errorMessage}</Text>
+    {/if}
     <Space h="lg" />
     <Button fullSize on:click={Upload}>Upload</Button>
 </Modal>
