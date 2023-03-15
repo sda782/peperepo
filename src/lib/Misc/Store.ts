@@ -1,5 +1,5 @@
 import type { StorageReference } from "firebase/storage";
-import { writable, type Writable } from "svelte/store";
+import { readable, writable, type Readable, type Writable } from "svelte/store";
 
 export type ImageData = {
     url: string,
@@ -7,3 +7,5 @@ export type ImageData = {
 }
 
 export const imageDatas: Writable<ImageData[]> = writable([])
+export const displaySize: Readable<number> = readable(300)
+export const uploadSize: Readable<number> = readable(200)

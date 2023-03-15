@@ -8,6 +8,9 @@
 </script>
 
 <Group spacing="xs">
-    <span>{auth.currentUser.email}</span>
+    <span
+        >{auth.currentUser.displayName !== null
+            ? auth.currentUser.displayName
+            : auth.currentUser.email}</span>
     <Button variant="subtle" size="xs" on:click={logout}>Log out</Button>
 </Group>

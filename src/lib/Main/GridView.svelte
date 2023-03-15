@@ -1,15 +1,16 @@
 <script lang="ts">
     import { Button, Group, Image, Modal } from "@svelteuidev/core";
+    import { isSignedIn } from "../Auth/AuthManager";
     import {
         deleteImage,
         getImages,
     } from "../firebaseStorage/firebaseStorageApi";
-    import { imageDatas as imageDatas } from "../Misc/Store";
+    import { displaySize, imageDatas as imageDatas } from "../Misc/Store";
     let currentImageData = undefined;
-
-    const size = 300;
-    getImages();
     let opened = false;
+
+    getImages();
+
     const deleteImg = () => {
         deleteImage(currentImageData).then(() => {
             currentImageData = undefined;
@@ -27,13 +28,15 @@
     {#each $imageDatas as img}
         <Image
             radius="md"
-            width={size}
-            height={size}
+            width={$displaySize}
+            height={$displaySize}
             src={img.url}
             alt=""
             on:dblclick={() => {
-                opened = true;
-                currentImageData = img;
+                if ($isSignedIn) {
+                    opened = true;
+                    currentImageData = img;
+                }
             }} />
     {/each}
 </Group>

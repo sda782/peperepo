@@ -9,6 +9,7 @@
     } from "@svelteuidev/core";
     import { upload } from "../firebaseStorage/firebaseStorageApi";
     import addButonImage from "../../assets/add_white.png";
+    import { resize } from "../Misc/Convert";
 
     export let opened: boolean = false;
     let preview: string = undefined;
@@ -23,7 +24,7 @@
         let reader = new FileReader();
         reader.readAsDataURL(imageData);
         reader.onload = (e: ProgressEvent<FileReader>) => {
-            preview = e.target.result.toString();
+            preview = resize(e.target.result.toString());
         };
     };
 
@@ -47,6 +48,7 @@
     };
 
     async function pasteImage() {
+        preview = undefined;
         try {
             const permissionName = "clipboard-read" as PermissionName;
             const permission = await navigator.permissions.query({
@@ -62,7 +64,7 @@
                     onFail();
                     return;
                 }
-                const blob = await item.getType("image/png");
+                let blob = await item.getType("image/png");
                 setPreview(blob);
             }
         } catch (error) {
@@ -71,18 +73,15 @@
     }
 </script>
 
+<svelte:window />
 <Modal centered {opened} on:close={onClose} title="Upload rare pepe" size="xs">
     <Center>
-        {#if preview}
-            <Image src={preview} />
-        {:else}
-            <Image
-                width="150px"
-                src={addButonImage}
-                on:click={() => {
-                    pasteImage();
-                }} />
-        {/if}
+        <Image
+            width="150px"
+            src={preview === undefined ? addButonImage : preview}
+            on:click={() => {
+                pasteImage();
+            }} />
     </Center>
     <input
         style="display:none"
